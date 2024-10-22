@@ -1,45 +1,59 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CategoriaService } from '../../services/categoria.service'; 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ActivatedRoute } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { ICategoria } from '../../interfaces'; 
-import { LoaderComponent } from '../../components/loader/loader.component';
-import { CategoriaListComponent } from '../../components/categoria/categoria-list/categoria-list.component'; 
+import { Component, inject, ViewChild } from '@angular/core';
+import { PaginationComponent } from '../../components/pagination/pagination.component';
 import { ModalComponent } from '../../components/modal/modal.component';
-import { CategoriaFormComponent } from '../../components/categoria/categoria-form/categoria-form.component'; 
+import { LoaderComponent } from '../../components/loader/loader.component';
+import { ModalService } from '../../services/modal.service';
+import { ICategoria, IRoleType } from '../../interfaces';
+import { FormBuilder, Validators } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
+import { CategoriasListComponent } from '../../components/categorias/categoria-list/categoria-list.component';
+import { CategoriasFormComponent } from '../../components/categorias/categoria-form/categoria-form.component';
+import { CategoriaService } from '../../services/categoria.service';
 
 @Component({
-  selector: 'app-categoria', 
-  standalone: true, 
+  selector: 'app-categorias',
+  standalone: true,
   imports: [
-    LoaderComponent,
-    CategoriaListComponent,
+    CategoriasListComponent,
+    PaginationComponent,
     ModalComponent,
-    CategoriaFormComponent 
+    LoaderComponent,
+    CategoriasFormComponent
   ],
   templateUrl: './categoria.component.html',
   styleUrl: './categoria.component.scss'
 })
-export class CategoriaComponent implements OnInit {
-  public categoriaService: CategoriaService = inject(CategoriaService);
-  public modalService: NgbModal = inject(NgbModal);
-  public route: ActivatedRoute = inject(ActivatedRoute);
+export class CategoriasComponent {
+  public categoriasService: CategoriaService = inject(CategoriaService);
+  public modalService: ModalService = inject(ModalService);
   public authService: AuthService = inject(AuthService);
-  public routeAuthorities: string[] = [];
-  public areActionsAvailable: boolean = false;
+  @ViewChild('addCategoriasModal') public addCategoriasModal: any;
+  public fb: FormBuilder = inject(FormBuilder);
+  categoriaForm = this.fb.group({
+    id: [''],
+    nombre: ['', Validators.required],
+    descripcion: ['', Validators.required],
+  })
 
-  ngOnInit(): void {
-    this.authService.getUserAuthorities();
-    this.categoriaService.getAll(); 
-    this.route.data.subscribe(data => {
-      this.routeAuthorities = data['authorities'] ? data['authorities'] : [];
-      this.areActionsAvailable = this.authService.areActionsAvailable(this.routeAuthorities);
-    });
+  constructor() {
+    this.categoriasService.search.page = 1;
+    this.authService.isSuperAdmin() ?  this.categoriasService.getAll() : this.categoriasService.getAll();
   }
 
-  onFormEventCalled(params: ICategoria) { 
-    this.categoriaService.save(params); 
-    this.modalService.dismissAll();
+  saveCategoria(categoria: ICategoria) {
+    this.categoriasService.save(categoria);
+    this.modalService.closeAll();
+  }
+
+  callEdition(categoria: ICategoria) {
+    this.categoriaForm.controls['id'].setValue(categoria.id ? JSON.stringify(categoria.id) : '');
+    this.categoriaForm.controls['nombre'].setValue(categoria.nombre ? categoria.nombre : '');
+    this.categoriaForm.controls['descripcion'].setValue(categoria.descripcion ? categoria.descripcion : '');
+    this.modalService.displayModal('md', this.addCategoriasModal);
+  }
+  
+  updateCategoria(categoria: ICategoria) {
+    this.categoriasService.update(categoria);
+    this.modalService.closeAll();
   }
 }

@@ -11,8 +11,9 @@ import { GuestGuard } from './guards/guest.guard';
 import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { GamesComponent } from './pages/games/games.component';
-import { ProductoComponent } from './pages/producto/producto.component';
-import { CategoriaComponent } from './pages/categoria/categoria.component';
+import { OrdersComponent } from './pages/orders/orders.component';
+import { ProductsComponent } from './pages/products/products.component';
+import { CategoriasComponent } from './pages/categoria/categoria.component';
 
 export const routes: Routes = [
   {
@@ -97,31 +98,43 @@ export const routes: Routes = [
         }
       },
       {
-        path: 'producto',
-        component: ProductoComponent,
+        path: 'orders',
+        component: OrdersComponent,
         data: { 
           authorities: [
             IRoleType.admin, 
             IRoleType.superAdmin,
             IRoleType.user,
           ],
-          name: 'producto',
+          name: 'orders',
           showInSidebar: true
         }
       },
       {
-        path: 'categoria',
-        component: CategoriaComponent,
+        path: 'products',
+        component: ProductsComponent,
         data: { 
           authorities: [
-            IRoleType.admin, 
             IRoleType.superAdmin,
             IRoleType.user,
           ],
-          name: 'categoria',
+          name: 'productos',
           showInSidebar: true
         }
       },
+      {
+        path: 'categorias',
+        component: CategoriasComponent,
+        data: { 
+          authorities: [
+            IRoleType.superAdmin,
+            IRoleType.user,
+          ],
+          name: 'categorias',
+          showInSidebar: true
+        }
+      },
+      
     ],
   },
 ];

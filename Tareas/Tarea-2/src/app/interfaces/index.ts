@@ -42,34 +42,48 @@ export enum IRoleType {
 }
 
 export interface IRole {
-  createdAt: string,
-  description: string,
-  id: number
-  name : string,
-  updatedAt: string
+  createdAt: string;
+  description: string;
+  id: number;
+  name : string;
+  updatedAt: string;
 }
 
 export interface IGame {
-  id?: number
-  name?: string,
-  imgURL?: string,
-  status?: string,
-  description?: string,
-  createdAt?: string,
-  updatedAt?: string
+  id?: number;
+  name?: string;
+  imgURL?: string;
+  status?: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface IProducto {
-  id?: number,
-  nombre?: string
-  descripcion?: string,
-  precio?: number,
-  cantidadEnStock?: number,
-  categoria?: ICategoria,
+export interface IOrder {
+  id?: number;
+  description?: string;
+  total?: number;
 }
 
+export interface ISearch {
+  page?: number;
+  size?: number;
+  pageNumber?: number;
+  pageSize?: number;
+  totalElements?: number;
+  totalPages?:number;
+}
+
+export interface IProduct {
+  id?: number;
+  nombre?: string;
+  descripcion?: string;
+  precio?: number;
+  cantidadEnStock?: number;
+  categoria?: ICategoria
+}
 export interface ICategoria {
-  id?: number,
-  nombre?: string
-  descripcion?: string,
-  }
+  id?: number;
+  nombre?: string;
+  descripcion?: string;
+}

@@ -1,79 +1,77 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { BaseService } from './base-service';
-import { ICategoria } from '../interfaces';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ICategoria, ISearch } from '../interfaces';
+import { AuthService } from './auth.service';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoriaService extends BaseService<ICategoria> {
   protected override source: string = 'categorias';
-  private itemListSignal = signal<ICategoria[]>([]);
-  private snackBar = inject(MatSnackBar);
-
-  get items$() {
-    return this.itemListSignal;
+  private categoriaListSignal = signal<ICategoria[]>([]);
+  get categorias$() {
+    return this.categoriaListSignal;
   }
+  public search: ISearch = { 
+    page: 1,
+    size: 5
+  }
+  public totalItems: any = [];
+  private authService: AuthService = inject(AuthService);
+  private alertService: AlertService = inject(AlertService);
 
-  public getAll() {
-    this.findAll().subscribe({
+  getAll() {
+    this.findAllWithParams({ page: this.search.page, size: this.search.size}).subscribe({
       next: (response: any) => {
-        response.reverse();
-        this.itemListSignal.set(response);
+        this.search = {...this.search, ...response.meta};
+        this.totalItems = Array.from({length: this.search.totalPages ? this.search.totalPages : 0}, (_, i) => i+1);
+        this.categoriaListSignal.set(response.data);
       },
-      error: (error: any) => {
-        console.log('error', error);
+      error: (err: any) => {
+        console.error('error', err);
       }
     });
   }
 
-  public save(item: ICategoria) {
-    this.add(item).subscribe({
+  
+  save(categoria: ICategoria) {
+    this.add( categoria).subscribe({
       next: (response: any) => {
-        this.itemListSignal.update((categoria: ICategoria[]) => [response, ...categoria]);
+        this.alertService.displayAlert('success', response.message, 'center', 'top', ['success-snackbar']);
+        this.getAll();
       },
-      error: (error: any) => {
-        this.snackBar.open(error.error.description, 'Close', {
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-          panelClass: ['error-snackbar']
-        });
-        console.error('error', error);
+      error: (err: any) => {
+        this.alertService.displayAlert('error', 'An error occurred adding the category','center', 'top', ['error-snackbar']);
+        console.error('error', err);
       }
     });
   }
 
-  public update(item: ICategoria) {
-    this.edit(item.id, item).subscribe({
-      next: () => {
-        const updatedItems = this.itemListSignal().map(categoria => categoria.id === item.id ? item : categoria);
-        this.itemListSignal.set(updatedItems);
+  update(categoria: ICategoria) {
+    this.editCustomSource(`${categoria.id}`, categoria).subscribe({
+      next: (response: any) => {
+        this.alertService.displayAlert('success', response.message, 'center', 'top', ['success-snackbar']);
+        this.getAll();
       },
-      error: (error: any) => {
-        this.snackBar.open(error.error.description, 'Close', {
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-          panelClass: ['error-snackbar']
-        });
-        console.error('error', error);
+      error: (err: any) => {
+        this.alertService.displayAlert('error', 'An error occurred updating the category','center', 'top', ['error-snackbar']);
+        console.error('error', err);
       }
     });
   }
 
-  public delete(categoria: ICategoria) {
-    this.del(categoria.id).subscribe({
-      next: () => {
-        const updatedItems = this.itemListSignal().filter((c: ICategoria) => c.id != categoria.id);
-        this.itemListSignal.set(updatedItems);
+  delete(categoria: ICategoria) {
+    this.delCustomSource(`${categoria.id}`).subscribe({
+      next: (response: any) => {
+        this.alertService.displayAlert('success', "category deleted", 'center', 'top', ['success-snackbar']);
+        this.getAll();
       },
-      error: (error: any) => {
-        this.snackBar.open(error.error.description, 'Close', {
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-          panelClass: ['error-snackbar']
-        });
-        console.error('error', error);
+      error: (err: any) => {
+        this.alertService.displayAlert('error', 'An error occurred deleting the category','center', 'top', ['error-snackbar']);
+        console.error('error', err);
       }
     });
   }
+
 }
