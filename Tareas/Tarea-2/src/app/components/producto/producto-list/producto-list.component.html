@@ -1,0 +1,46 @@
+<div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Description</th>
+          <th scope="col">Precio</th>
+          <th scope="col">Cantidad</th>
+          <th scope="col">categoria</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of itemList; track $index) {
+          <tr>
+            <th scope="row">{{item.id}}</th>
+            <td>{{item.nombre}}</td>
+            <td>{{item.descripcion}}</td>
+            <td>{{item.precio}}</td>
+            <td>{{item.cantidadEnStock}}</td>
+            <td>{{item.categoria?.nombre}}</td>
+            
+            <td>
+              <button type="button" (click)="showDetailModal(item, detailModal)"  class="btn btn-secondary">
+                <i class="fa-solid fa-eye white"
+                ></i>
+              </button>
+              <button type="button" (click)="deleteGame(item)" class="btn btn-danger">
+                <i class="fa-solid fa-trash white"
+                ></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  
+  <app-modal #detailModal> 
+    <app-producto-form 
+    (callParentEvent)="onFormEventCalled($event)"
+    [title]="'Update Producto'"
+    [toUpdateProducto]="selectedItem"/>
+    
+  </app-modal>
+  
