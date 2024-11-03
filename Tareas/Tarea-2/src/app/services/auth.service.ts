@@ -91,7 +91,9 @@ export class AuthService {
   }
 
   public signup(user: IUser): Observable<ILoginResponse> {
+    console.log(user);
     return this.http.post<ILoginResponse>('auth/signup', user);
+  
   }
 
   public logout() {
