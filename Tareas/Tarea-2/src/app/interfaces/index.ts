@@ -89,3 +89,34 @@ export interface ICategoria {
   nombre?: string;
   descripcion?: string;
 }
+
+
+export interface Resource {
+  id: number;
+  name: string;
+  price: number;
+  availability: boolean;
+  location: string;
+  providerName: string;
+  providerContact: string;
+  providerRating: number;
+  description: string;
+}
+
+
+export interface SolicitudRecursos{
+  id: number;
+  resourceId: number;
+  quantity: number;
+  eventDate: Date;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Modified' | 'Cancelled';
+}
+
+export interface Cotizacion {
+  id: number;
+  event: string;
+  service: string;
+  quotedAmount: number;
+  resourceQuantity?: number;
+  status: 'Sent' | 'Accepted' | 'Rejected';
+}

@@ -1,13 +1,14 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { BaseService } from './base-service';
 import { ISearch, IUser } from '../interfaces';
-import { Observable, catchError, tap, throwError } from 'rxjs';
+import { Observable, catchError, tap, throwError, of } from 'rxjs';
 import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService extends BaseService<IUser> {
+  private apiUrl = 'http://localhost:4200/app/users';
   protected override source: string = 'users';
   private userListSignal = signal<IUser[]>([]);
   get users$() {
@@ -19,6 +20,12 @@ export class UserService extends BaseService<IUser> {
   }
   public totalItems: any = [];
   private alertService: AlertService = inject(AlertService);
+
+  getUsers(): Observable<IUser[]> {
+
+    return of(this.userListSignal());
+
+  }
 
   getAll() {
     this.findAllWithParams({ page: this.search.page, size: this.search.size}).subscribe({
@@ -63,7 +70,7 @@ export class UserService extends BaseService<IUser> {
   delete(user: IUser) {
     this.delCustomSource(`${user.id}`).subscribe({
       next: (response: any) => {
-        this.alertService.displayAlert('success', response.message, 'center', 'top', ['success-snackbar']);
+        this.alertService.displayAlert('success', "deleted", 'center', 'top', ['success-snackbar']);
         this.getAll();
       },
       error: (err: any) => {
